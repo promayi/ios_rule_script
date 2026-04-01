@@ -4,7 +4,7 @@ on:
   schedule:
     # 这里的 cron 表达式使用的是 UTC 时间
     # 20:14 UTC = 04:14 北京时间 (UTC+8)
-    - cron: '14 20 * * *'
+    # - cron: '14 20 * * *' #-> 删除最前面的“#”开启自动同步
   workflow_dispatch: # 保留手动触发按钮，方便你随时手动同步
 
 jobs:
