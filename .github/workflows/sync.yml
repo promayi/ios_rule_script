@@ -1,0 +1,37 @@
+name: Auto Sync Fork
+
+on:
+  schedule:
+    # 这里的 cron 表达式使用的是 UTC 时间
+    # 20:14 UTC = 04:14 北京时间 (UTC+8)
+    - cron: '14 20 * * *'
+  workflow_dispatch: # 保留手动触发按钮，方便你随时手动同步
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target repo
+        uses: actions/checkout@v4
+        with:
+          ref: master # 同步你的 master 分支
+          fetch-depth: 0 # 获取所有历史记录，防止合并时报错
+          
+      - name: Sync with upstream
+        run: |
+          # 1. 配置 Git 机器人信息
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          # 2. 添加黑矩阵大佬的原仓库地址作为 upstream
+          git remote add upstream https://github.com/blackmatrix7/ios_rule_script.git
+          
+          # 3. 获取原仓库的最新更新
+          git fetch upstream
+          
+          # 4. 合并原仓库的 master 分支到你当前的 master 分支
+          # 使用 --allow-unrelated-histories 避免一些意外的合并拒绝错误
+          git merge upstream/master --allow-unrelated-histories
+          
+          # 5. 推送更新到你自己的仓库 (promayi/ios_rule_script)
+          git push origin master
